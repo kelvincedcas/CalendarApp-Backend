@@ -63,20 +63,26 @@ const loginUser = async(req, res) => {
         user.otp = generateOTP();
         user.otpExpires = Date.now() + 15 * 60 * 1000; // 15 minutos
         await user.save();
+        const {id, name} = user;
 
         // TODO: enviar correo electronico con el OTP
         await sendOTPEmail(user.name, user.email, user.otp);
-        return res.status(401).json({
-            ok: false,
-            msg: 'Your account has not been confirmed.'
+
+        return res.status(200).json({
+            ok: true,
+            status: 'pending_confirmation',
+            id,
+            name,
+            email,
         });
     };
 
     // TODO: Generar JWT
     const token = generateJWT(user.id, user.name);
 
-    res.status(201).json({
+    res.status(200).json({
         ok: true,
+        status: 'authenticated',
         id: user.id,
         name: user.name,
         email: user.email,
@@ -99,7 +105,7 @@ const verifyOTP = async(req, res) => {
     if (user.otp !== otp) {
         return res.status(400).json({
             ok: false,
-            msg: 'OTP not valid.'
+            msg: 'OTP code not valid.'
         });
     };
 
@@ -121,6 +127,7 @@ const verifyOTP = async(req, res) => {
    
     res.status(201).json({
         ok: true,
+        status: 'authenticated',
         id: user.id,
         name: user.name,
         email: user.email,

@@ -17,10 +17,10 @@ export const jwtCheck = async(req, res, next) => {
             msg: 'There is no token in the request.'
         });
     };
+    
+    const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
     try {
-
-        const jwtSecretKey = process.env.JWT_SECRET_KEY;
 
         const payload = jwt.verify(
             token,

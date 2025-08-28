@@ -137,17 +137,51 @@ const verifyOTP = async(req, res) => {
 };
 
 /** @param {Request} req @param {Response} res */
+import jwt from 'jsonwebtoken';
+
 const revalidateJWT = async(req, res) => {
+  const { id, name } = req;
+  const user = await User.findById(id);
 
-    const {id, name} = req;
-
-    const token = generateJWT(id, name);
-
-    res.json({
-        ok: true,
-        token
+  if (!user) {
+    return res.status(404).json({
+      ok: false,
+      msg: 'User not found.'
     });
+  }
+
+  const oldToken = req.header('x-token'); // el token que mandó el cliente
+  const decoded = jwt.decode(oldToken); // 👈 no verifica firma, solo lee payload
+
+  const now = Math.floor(Date.now() / 1000);
+  const timeLeft = decoded.exp - now; // segundos restantes
+
+  // Si faltan menos de 45min (2700 seg), generamos uno nuevo
+  if (timeLeft < 2700) {
+    const token = await generateJWT(id, name, user.email);
+    return res.status(200).json({
+      ok: true,
+      status: 'authenticated',
+      id,
+      name,
+      email: user.email,
+      token,
+      renewed: true
+    });
+  }
+
+  // Si aún tiene suficiente vida útil, devolvemos mismo token
+  return res.status(200).json({
+    ok: true,
+    status: 'authenticated',
+    id,
+    name,
+    email: user.email,
+    token: oldToken,
+    renewed: false
+  });
 };
+
 
 /** @param {Request} req @param {Response} res */
 const resendOTP = async(req, res) => {

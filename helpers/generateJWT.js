@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export const generateJWT = (id, name) => {
+export const generateJWT = async (id, name) => {
 
     const jwtSecretKey = process.env.JWT_SECRET_KEY;
     const payload = {id, name};

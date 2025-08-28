@@ -7,4 +7,4 @@ export const generateJWT = async (id, name) => {
     return jwt.sign(payload, jwtSecretKey, {
         expiresIn: '2h'
     });
-}
+};

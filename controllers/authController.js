@@ -78,7 +78,7 @@ const loginUser = async(req, res) => {
     };
 
     // TODO: Generar JWT
-    const token = generateJWT(user.id, user.name);
+    const token = await generateJWT(user.id, user.name);
 
     res.status(200).json({
         ok: true,
@@ -123,7 +123,7 @@ const verifyOTP = async(req, res) => {
     
     // TODO: generar JWT
 
-    const token = generateJWT(user.id, user.name);
+    const token = await generateJWT(user.id, user.name);
    
     res.status(201).json({
         ok: true,
@@ -158,7 +158,7 @@ const revalidateJWT = async(req, res) => {
 
   // Si faltan menos de 45min (2700 seg), generamos uno nuevo
   if (timeLeft < 2700) {
-    const token = await generateJWT(id, name, user.email);
+    const token = await generateJWT(id, name);
     return res.status(200).json({
       ok: true,
       status: 'authenticated',

@@ -63,8 +63,6 @@ export const updateEvent = async (req, res) => {
     try {
 
         const event = await Event.findById(id);
-        console.log(event);
-        console.log(userId);
 
         if(!event) {
             return res.status(404).json({
